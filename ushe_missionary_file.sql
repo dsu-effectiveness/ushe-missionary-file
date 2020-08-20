@@ -11,7 +11,14 @@
              TO_CHAR(c.spbpers_birth_date,'YYYYMMDD') AS m_birth_dt,
              TO_CHAR(d.stvterm_end_date, 'YYYYMMDD') AS m_start_dt,
              TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
-             a.s_banner_id AS m_banner_id
+             a.s_banner_id AS m_banner_id,
+             CASE
+                WHEN dsc_term_code = '201943' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'FTFB201940'
+                WHEN dsc_term_code = '201943' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'FTPB201940'
+                WHEN dsc_term_code = '201943' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'FTFO201940'
+                WHEN dsc_term_code = '201943' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'FTPO201940'
+                END AS sgrchrt_chrt_code,
+             a.banner_term
         FROM students03 a
    INNER JOIN spriden b on b.spriden_pidm = a.dsc_pidm
    INNER JOIN spbpers c on c.spbpers_pidm = a.dsc_pidm
@@ -25,3 +32,4 @@
                                                            AND a1.dsc_term_code = substr(a.dsc_term_code, 1, 4) || '3E' -- The Summer previous to that Fall.
                                                            AND a1.s_entry_action IN ('FF', 'FH', 'HS') -- If they were HS in Summer, and FH the next Fall, I assume they should have been labeled FH.
                                                     ) AND (s_entry_action = 'CS')))
+
