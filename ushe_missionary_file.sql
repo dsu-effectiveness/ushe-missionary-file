@@ -20,14 +20,9 @@ WITH cohorts AS (SELECT a.dsc_pidm,
                            WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'FTPB201240'
                            WHEN dsc_term_code = '201243' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'FTFO201240'
                            WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'FTPO201240'
-                           /* 201343 */
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'FTFB201340'
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'FTPB201340'
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'FTFO201340'
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'FTPO201340'
                            END AS sgrchrt_chrt_code
                    FROM students03 a
-                  WHERE dsc_term_code IN ('201943', '201443', '201343', '201243')
+                  WHERE dsc_term_code IN ('201943', '201443', '201243')
                     AND s_pt_ft IN ('F', 'P')
                     AND (s_entry_action IN ('FF', 'FH') OR (EXISTS(SELECT 'Y'
                                                                      FROM students03 a1
@@ -46,14 +41,9 @@ WITH cohorts AS (SELECT a.dsc_pidm,
                            WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'TUPB201240'
                            WHEN dsc_term_code = '201243' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'TUFO201240'
                            WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'TUPO201240'
-                           /* 201343 */
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'TUFB201340'
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'TUPB201340'
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'TUFO201340'
-                           WHEN dsc_term_code = '201343' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'TUPO201340'
                            END AS sgrchrt_chrt_code
                  FROM students03 a
-                WHERE dsc_term_code IN ('201243', '201343')
+                WHERE dsc_term_code = '201243'
                   AND s_pt_ft IN ('F', 'P')
                   AND (s_entry_action = 'TU' OR (EXISTS(SELECT 'Y'
                                                           FROM students03 a1
@@ -86,14 +76,14 @@ WITH cohorts AS (SELECT a.dsc_pidm,
 /* USHE Submission Query */
 
       SELECT DISTINCT
-            3671 AS m_inst,
-            b.spriden_last_name AS m_last,
-            b.spriden_first_name AS m_first,
-            b.spriden_mi AS m_middle,
-            TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD') AS m_birth_dt,
-            TO_CHAR(MIN(d.stvterm_end_date), 'YYYYMMDD') AS m_start_dt, /* oldest term end date */
-            TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
-            b.spriden_id AS m_banner_id
+             3671 AS m_inst,
+             b.spriden_last_name AS m_last,
+             b.spriden_first_name AS m_first,
+             b.spriden_mi AS m_middle,
+             TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD') AS m_birth_dt,
+             TO_CHAR(MIN(d.stvterm_end_date), 'YYYYMMDD') AS m_start_dt, /* oldest term end date */
+             TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
+             b.spriden_id AS m_banner_id
         FROM cohorts a
   INNER JOIN spriden b
           ON b.spriden_pidm = a.dsc_pidm
@@ -102,13 +92,11 @@ WITH cohorts AS (SELECT a.dsc_pidm,
   INNER JOIN stvterm d
           ON d.stvterm_code = a.sgrchrt_term_code_eff
        WHERE b.spriden_change_ind IS NULL
-    GROUP BY
-            b.spriden_last_name ,
-            b.spriden_first_name,
-            b.spriden_mi,
-            TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD'),
-            TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD'),
-            b.spriden_id
-    ;
+    GROUP BY b.spriden_last_name,
+             b.spriden_first_name,
+             b.spriden_mi,
+             TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD'),
+             TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD'),
+             b.spriden_id;
 
 
