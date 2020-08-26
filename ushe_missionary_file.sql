@@ -83,7 +83,7 @@ WITH cohorts AS (SELECT a.dsc_pidm,
              TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD') AS m_birth_dt,
              TO_CHAR(MIN(d.stvterm_end_date), 'YYYYMMDD') AS m_start_dt, /* oldest term end date */
              TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
-             b.spriden_id AS m_banner_id
+             'D' || b.spriden_id AS m_banner_id
         FROM cohorts a
   INNER JOIN spriden b
           ON b.spriden_pidm = a.dsc_pidm
@@ -98,5 +98,4 @@ WITH cohorts AS (SELECT a.dsc_pidm,
              TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD'),
              TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD'),
              b.spriden_id;
-
 
