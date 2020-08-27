@@ -77,11 +77,12 @@ WITH cohorts AS (SELECT a.dsc_pidm,
 
       SELECT DISTINCT
              3671 AS m_inst,
-             b.spriden_last_name AS m_last,
-             b.spriden_first_name AS m_first,
-             b.spriden_mi AS m_middle,
+             CAST(b.spriden_last_name AS varchar(60)) AS m_last,
+             CAST(b.spriden_first_name AS varchar(15)) m_first,
+             CAST(b.spriden_mi AS varchar(15)) AS m_middle,
              TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD') AS m_birth_dt,
-             TO_CHAR(MIN(d.stvterm_end_date), 'YYYYMMDD') AS m_start_dt, /* oldest term end date */
+             /* oldest term end date */
+             TO_CHAR(MIN(d.stvterm_end_date), 'YYYYMMDD') AS m_start_dt,
              TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
              'D' || b.spriden_id AS m_banner_id
         FROM cohorts a
