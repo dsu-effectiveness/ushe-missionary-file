@@ -2,79 +2,18 @@
  Missionary Submission File to USHE
  Run against PROD DB
  */
-WITH cohorts AS (SELECT a.dsc_pidm,
-                        SUBSTR(dsc_term_code, 0, 5) || '0' AS sgrchrt_term_code_eff,
-                        CASE
-                           /* 201943 */
-                           WHEN dsc_term_code = '201943' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'FTFB201940'
-                           WHEN dsc_term_code = '201943' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'FTPB201940'
-                           WHEN dsc_term_code = '201943' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'FTFO201940'
-                           WHEN dsc_term_code = '201943' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'FTPO201940'
-                           /* 201443 */
-                           WHEN dsc_term_code = '201443' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'FTFB201440'
-                           WHEN dsc_term_code = '201443' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'FTPB201440'
-                           WHEN dsc_term_code = '201443' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'FTFO201440'
-                           WHEN dsc_term_code = '201443' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'FTPO201440'
-                           /* 201243 */
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'FTFB201240'
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'FTPB201240'
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'FTFO201240'
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'FTPO201240'
-                           END AS sgrchrt_chrt_code
-                   FROM students03 a
-                  WHERE dsc_term_code IN ('201943', '201443', '201243')
-                    AND s_pt_ft IN ('F', 'P')
-                    AND (s_entry_action IN ('FF', 'FH') OR (EXISTS(SELECT 'Y'
-                                                                     FROM students03 a1
-                                                                    WHERE a1.dsc_pidm = a.dsc_pidm
-                                                                      AND a1.dsc_term_code = substr(a.dsc_term_code, 1, 4) || '3E' -- The Summer previous to that Fall.
-                                                                      AND a1.s_entry_action IN ('FF', 'FH', 'HS') -- If they were HS in Summer, and FH the next Fall, I assume they should have been labeled FH.
-                                                               ) AND (s_entry_action = 'CS')))
 
-                  UNION
-
-                  /* Transfers */
-                  SELECT dsc_pidm AS sgrchrt_pidm,
-                         SUBSTR(dsc_term_code, 0, 5) || '0' AS sgrchrt_term_code_eff,
-                        CASE
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'F' AND s_deg_intent = '4' THEN 'TUFB201240'
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent = '4' THEN 'TUPB201240'
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'F' AND s_deg_intent != '4' THEN 'TUFO201240'
-                           WHEN dsc_term_code = '201243' AND s_pt_ft = 'P' AND s_deg_intent != '4' THEN 'TUPO201240'
-                           END AS sgrchrt_chrt_code
-                 FROM students03 a
-                WHERE dsc_term_code = '201243'
-                  AND s_pt_ft IN ('F', 'P')
-                  AND (s_entry_action = 'TU' OR (EXISTS(SELECT 'Y'
-                                                          FROM students03 a1
-                                                         WHERE a1.dsc_pidm = a.dsc_pidm
-                                                           AND a1.dsc_term_code = substr(a.dsc_term_code, 1, 4) || '3E' -- The Summer previous to that Fall.
-                                                           AND a1.s_entry_action = 'TU' -- If they were TU in Summer, and something else the next Fall, I assume they should have been labeled TU.
-                                                    ) AND (s_entry_action != 'HS')))
-
-                  UNION
-
-                  /* SPRING */
-                  SELECT dsc_pidm AS sgrchrt_pidm,
-                         SUBSTR(dsc_term_code, 0, 5) || '0' AS sgrchrt_term_code_eff,
-                         CASE
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'F' AND s_deg_intent = '4' AND s_entry_action IN ('FF', 'FH') THEN 'FTFB201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'F' AND s_deg_intent != '4' AND s_entry_action IN ('FF', 'FH') THEN 'FTFO201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'P' AND s_deg_intent = '4' AND s_entry_action IN ('FF', 'FH') THEN 'FTPB201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'P' AND s_deg_intent != '4' AND s_entry_action IN ('FF', 'FH') THEN 'FTPO201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'F' AND s_deg_intent = '4' AND s_entry_action = 'TU' THEN 'TUFB201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'F' AND s_deg_intent != '4' AND s_entry_action = 'TU' THEN 'TUFO201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'P' AND s_deg_intent = '4' AND s_entry_action = 'TU' THEN 'TUPB201320'
-                            WHEN dsc_term_code = '201323' AND s_pt_ft = 'P' AND s_deg_intent != '4' AND s_entry_action = 'TU' THEN 'TUPO201320'
-                            END AS sgrchrt_chrt_code
-                   FROM students03 a
-                  WHERE dsc_term_code = '201323'
-                    AND s_pt_ft IN ('F', 'P')
-                    AND s_entry_action IN ('FF', 'FH', 'TU')
-   )
+WITH cohorts AS (SELECT a.sgrchrt_pidm AS pidm,
+                        sgrchrt_term_code_eff,
+                        b.stvterm_desc AS term,
+                        sgrchrt_chrt_code
+                   FROM sgrchrt a
+                        LEFT JOIN stvterm b
+                        ON b.stvterm_code = a.sgrchrt_term_code_eff
+                  WHERE b.stvterm_desc IN ('Fall 2013', 'Spring 2014', 'Fall 2014', 'Spring 2015')
+                    AND (sgrchrt_chrt_code LIKE 'FT%' OR sgrchrt_chrt_code LIKE 'TU%'))
 
 /* USHE Submission Query */
-
       SELECT DISTINCT
              3671 AS m_inst,
              CAST(b.spriden_last_name AS varchar(60)) AS m_last,
@@ -83,13 +22,13 @@ WITH cohorts AS (SELECT a.dsc_pidm,
              TO_CHAR(c.spbpers_birth_date, 'YYYYMMDD') AS m_birth_dt,
              /* oldest term end date */
              TO_CHAR(MIN(d.stvterm_end_date), 'YYYYMMDD') AS m_start_dt,
-             TO_CHAR(TO_DATE('08-31-2020', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
+             TO_CHAR(TO_DATE('01-31-2021', 'MM-DD-YYYY'), 'YYYYMMDD') AS m_end_dt,
              'D' || b.spriden_id AS m_banner_id
         FROM cohorts a
   INNER JOIN spriden b
-          ON b.spriden_pidm = a.dsc_pidm
+          ON b.spriden_pidm = a.pidm
   INNER JOIN spbpers c
-          ON c.spbpers_pidm = a.dsc_pidm
+          ON c.spbpers_pidm = a.pidm
   INNER JOIN stvterm d
           ON d.stvterm_code = a.sgrchrt_term_code_eff
        WHERE b.spriden_change_ind IS NULL
